@@ -109,5 +109,28 @@ namespace email_analyzer
                 result.Raw[i] = a.Raw[i] - result.Raw[i];
             return result;
         }
+
+        public static Graph OR(string[] n)
+        {
+            ParsedPackage[] data;
+            Graph graph = new Graph();
+            for (int i = StartDay; i <= EndDay; i++)
+                if (File.Exists(SaveLocation + "parsedData-" + i + ".json"))
+                {
+                    data = Newtonsoft.Json.JsonConvert.DeserializeObject<ParsedPackage[]>(File.ReadAllText(SaveLocation + "parsedData-" + i + ".json"));
+                    for (int j = 0; j < data.Length; j++)
+                    {
+                        for(int h = 0; h < n.Length; h++)
+                        {
+                            if (data[j].From.Contains(n[h]))
+                            {
+                                graph.Raw[(((data[j].TimeDelivered.DayOfYear - StartDay) * 24 + data[j].TimeDelivered.Hour) * 60 + data[j].TimeDelivered.Minute) / Precision]++;
+                                break;
+                            }
+                        }
+                    }
+                }
+            return graph;
+        }
     }
 }
